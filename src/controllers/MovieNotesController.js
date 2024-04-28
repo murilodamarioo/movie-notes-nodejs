@@ -5,7 +5,12 @@ const knex = require('../database/knex')
 class MovieNotesController {
 
     async show(request, response) {
-        
+        const { id } = request.params
+
+        const movieNotes = await knex('movie_notes').where({ id }).first()
+        console.log(movieNotes)
+
+        return response.status(200).json({...movieNotes})
     }
 
     async create(request, response) {
@@ -15,8 +20,6 @@ class MovieNotesController {
         const useExists = knex('users').where({id: user_id}).first()
 
         if (!useExists) throw new AppError('ID de usuário inexistente')
-
-        console.log(typeof rating)
 
         if (rating > 5 || rating < 0 || typeof rating !== "number") throw new AppError('O valor do rating deve ser entre 0 e 5.')
 

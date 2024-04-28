@@ -51,7 +51,7 @@ class UsersController {
 
         if (!user) throw new AppError('Usuário não encontrado!')
 
-        const [userWithUpdatedEmail] = await knex('users').select([email]).where('email', email)
+        const [userWithUpdatedEmail] = await knex('users').select(['email']).where('email', email)
 
         if (userWithUpdatedEmail) throw new AppError('Este email já está em uso.')
 
@@ -69,7 +69,7 @@ class UsersController {
             user.password = await hash(password, 8)
         }
 
-        await knex('users').update([{name, email, password, updated_at: knex.raw('DATATIME(\'now\')')}]).where('id', id)
+        await knex('users').update({name, email, password: user.password, updated_at: knex.raw('DATETIME(\'now\')')}).where('id', id)
 
         return response.status(200).json()
     }

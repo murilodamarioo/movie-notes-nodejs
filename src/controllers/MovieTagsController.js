@@ -4,7 +4,7 @@ const knex = require('../database/knex')
 
 class MovieTagsController {
     
-    async create(request, response) {
+    async index(request, response) {
 
     }
 }

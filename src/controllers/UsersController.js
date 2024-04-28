@@ -6,6 +6,20 @@ const knex = require('../database/knex')
 
 class UsersController {
 
+    async show(request, response) {
+        const { id } = request.params
+
+        // First check if user exists
+        const [checkUserExists] = await knex('users').select(['id']).where('id', id)
+        console.log(checkUserExists)
+
+        if (!checkUserExists) throw new AppError('Usuário encontrado!')
+
+        const { name, email } = await knex('users').where('id', id).first()
+
+        return response.json({ name, email })
+    }
+
     async create(request, response) {
         // First extract some infos from request body
         const { name, email, password } = request.body
@@ -13,9 +27,8 @@ class UsersController {
         const [checkUserExists] = await knex('users').select(['email']).where('email', email)
         console.log(checkUserExists)
 
-        if (checkUserExists) {
-            throw new AppError('Este e-mail já está cadastrado')
-        }
+        if (checkUserExists) throw new AppError('Este e-mail já está cadastrado')
+
         console.log(checkUserExists)
 
         const hashPassword = await hash(password, 8)
@@ -27,6 +40,38 @@ class UsersController {
         })
 
         response.status(201).json()
+    }
+
+    async update(request, response) {
+        const { name, email, password, old_password } = request.body
+        const { id } = request.params
+        
+        const [user] = await knex('users').where('id', id)
+        console.log(user)
+
+        if (!user) throw new AppError('Usuário não encontrado!')
+
+        const [userWithUpdatedEmail] = await knex('users').select([email]).where('email', email)
+
+        if (userWithUpdatedEmail) throw new AppError('Este email já está em uso.')
+
+        user.name = name ?? user.name
+        user.email = email ?? user.email
+        console.log(`user password: ${user.password}`)
+
+        if (password && !old_password) throw new AppError('É necessário informar a senha antiga')
+
+        if (password && old_password) {
+            const checkOldPassword = await compare(old_password, user.password)
+            
+            if (!checkOldPassword) throw new AppError('Senha antiga inválida.')
+
+            user.password = await hash(password, 8)
+        }
+
+        await knex('users').update([{name, email, password, updated_at: knex.raw('DATATIME(\'now\')')}]).where('id', id)
+
+        return response.status(200).json()
     }
 }
 

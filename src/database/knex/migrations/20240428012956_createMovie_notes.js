@@ -1,4 +1,3 @@
-
 exports.up = knex => knex.schema.createTable('movie_notes', table => {
     table.increments('id')
     table.text('title')
@@ -10,5 +9,3 @@ exports.up = knex => knex.schema.createTable('movie_notes', table => {
 }) 
 
 exports.down = knex => knex.schema.droptable('movie_notes')
-
-//npx knex migrate:latest

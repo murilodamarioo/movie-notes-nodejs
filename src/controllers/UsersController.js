@@ -44,9 +44,9 @@ class UsersController {
 
     async update(request, response) {
         const { name, email, password, old_password } = request.body
-        const { id } = request.params
+        const user_id = request.user.id
         
-        const [user] = await knex('users').where('id', id)
+        const [user] = await knex('users').where('id', user_id)
         console.log(user)
 
         if (!user) throw new AppError('Usuário não encontrado!')
@@ -57,7 +57,6 @@ class UsersController {
 
         user.name = name ?? user.name
         user.email = email ?? user.email
-        console.log(`user password: ${user.password}`)
 
         if (password && !old_password) throw new AppError('É necessário informar a senha antiga')
 
@@ -69,7 +68,7 @@ class UsersController {
             user.password = await hash(password, 8)
         }
 
-        await knex('users').update({name, email, password: user.password, updated_at: knex.raw('DATETIME(\'now\')')}).where('id', id)
+        await knex('users').update({name, email, password: user.password, updated_at: knex.raw('DATETIME(\'now\')')}).where('id', user_id)
 
         return response.status(200).json()
     }

@@ -1,6 +1,6 @@
 const AppError = require('../utils/AppError')
 const knex = require('../database/knex')
-const { comapre } = require('bcryptjs')
+const { compare } = require('bcryptjs')
 
 const authConfig = require('../configs/auth')
 const { sign } = require('jsonwebtoken')
@@ -16,9 +16,9 @@ class SessionsController {
       throw new AppError('E-mail e/ou senha inválido(s)', 401)
     }
 
-    const passwrodMatched = await comapre(password, user.password)
+    const passwordMatched = await compare(password, user.password)
 
-    if (!passwrodMatched) {
+    if (!passwordMatched) {
       throw new AppError('E-mail e/ou senha inválido(s)', 401)
     }
 

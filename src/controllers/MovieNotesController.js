@@ -5,7 +5,8 @@ const knex = require('../database/knex')
 class MovieNotesController {
 
     async index(request, response) {
-        const {title, user_id, tags} = request.query
+        const user_id = request.user.id
+        const {title, tags} = request.query
 
         let movieNotes
 
@@ -42,9 +43,11 @@ class MovieNotesController {
     }
 
     async show(request, response) {
-        const { id } = request.params
+        const user_id = request.user.id
 
-        const movieNotes = await knex('movie_notes').where({ id }).first()
+        console.log(user_id)
+
+        const movieNotes = await knex('movie_notes').where({user_id}).first()
         console.log(movieNotes)
 
         return response.status(200).json({...movieNotes})
@@ -52,7 +55,7 @@ class MovieNotesController {
 
     async create(request, response) {
         const { title, description, rating, tags } = request.body
-        const { user_id } = request.params
+        const user_id = request.user.id
 
         const useExists = knex('users').where({id: user_id}).first()
 

@@ -1,4 +1,4 @@
-const knex = require('knex')
+const knex = require('../database/knex')
 const DiskStorage = require('../providers/DiskStorage')
 const AppError = require('../utils/AppError')
 
@@ -8,7 +8,6 @@ class UserAvatarController {
     const avatarFile = request.file.filename
 
     const diskStorage = new DiskStorage()
-
     const user = await knex('users').where({ id: user_id }).first()
 
     if (!user) {
@@ -22,7 +21,7 @@ class UserAvatarController {
     const filename = await diskStorage.saveFile(avatarFile)
     user.avatar = filename
 
-    await knex('users').update({ avata: filename }).where({ id: user_id })
+    await knex('users').update({ avatar: filename }).where({ id: user_id })
 
     return response.json(user)
   }

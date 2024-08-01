@@ -57,14 +57,13 @@ class MovieNotesController {
         const { title, description, rating, tags } = request.body
         const user_id = request.user.id
 
-        const useExists = knex('users').where({id: user_id}).first()
+        const userExists = await knex('users').where({id: user_id}).first()
 
-        if (!useExists) throw new AppError('ID de usuário inexistente')
+        if (!userExists) throw new AppError('ID de usuário inexistente')
 
-        if (rating > 5 || rating < 0 || typeof rating !== "number") throw new AppError('O valor do rating deve ser entre 0 e 5.')
+        //if (rating > 5 || rating < 0 || typeof rating !== "number") throw new AppError('O valor do rating deve ser entre 0 e 5.')
 
         const [note_id] = await knex('movie_notes').insert({ title, description, rating, user_id })
-        console.log(note_id)
 
         const movieTagsInsert = tags.map(name => {
             return {

@@ -34,23 +34,24 @@ class MovieNotesController {
             const movieNoteTags = userTags.filter(tag => tag.note_id === movieNote.id)
 
             return {
-                ...movieNotes,
+                ...movieNote,
                 tags: movieNoteTags
             }
         })
 
-        return response.status(200).json({ movieNotesWithTags })
+        return response.status(200).json(movieNotesWithTags)
     }
 
     async show(request, response) {
         const user_id = request.user.id
+        const movieNoteId = request.params.id
 
         console.log(user_id)
 
-        const movieNotes = await knex('movie_notes').where({user_id}).first()
-        console.log(movieNotes)
+        const movieNotes = await knex('movie_notes').where({user_id}).where({ id: movieNoteId }).first()
+        const tags = await knex('movie_tags').where({note_id: movieNoteId}).orderBy('name')
 
-        return response.status(200).json({...movieNotes})
+        return response.status(200).json({...movieNotes, tags})
     }
 
     async create(request, response) {
